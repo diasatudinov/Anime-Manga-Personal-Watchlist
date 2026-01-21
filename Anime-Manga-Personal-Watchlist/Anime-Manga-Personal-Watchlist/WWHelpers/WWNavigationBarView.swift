@@ -2,17 +2,53 @@
 //  WWNavigationBarView.swift
 //  Anime-Manga-Personal-Watchlist
 //
-//  Created by Dias Atudinov on 21.01.2026.
 //
 
 import SwiftUI
 
 struct WWNavigationBarView: View {
+    let leadingButtonTapped: () -> ()
+    let text: String
+    let trailingButtonTapped: () -> ()
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        HStack {
+            Button {
+                leadingButtonTapped()
+            } label: {
+                Image(systemName: "xmark")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 12)
+                    .foregroundStyle(.white)
+                    .bold()
+            }
+            
+            OutlinedText(
+                text: text,
+                font: .system(size: 18, weight: .semibold),
+                strokeColor: .textStroke,
+                fillColor: .white
+            )
+            .frame(maxWidth: .infinity)
+            
+            Button {
+                trailingButtonTapped()
+            } label: {
+                Image(systemName: "pencil")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 20)
+                    .foregroundStyle(.buttonsTop)
+            }
+            
+        }
+        .padding(.horizontal, 32)
+        .frame(maxWidth: .infinity)
+        .frame(height: 72)
+        .background(.navBarBg)
     }
 }
 
 #Preview {
-    WWNavigationBarView()
+    WWNavigationBarView(leadingButtonTapped: {}, text: "Anime Details", trailingButtonTapped: {})
 }

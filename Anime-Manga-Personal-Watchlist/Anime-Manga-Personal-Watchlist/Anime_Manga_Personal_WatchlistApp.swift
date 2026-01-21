@@ -10,7 +10,10 @@ import SwiftUI
 struct Anime_Manga_Personal_WatchlistApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavigationStack {
+                
+                WWMenuView()
+            }
         }
     }
 }

@@ -1,3 +1,11 @@
+//
+//  ImagePicker.swift
+//  Anime-Manga-Personal-Watchlist
+//
+//  Created by Dias Atudinov on 21.01.2026.
+//
+
+
 import SwiftUI
 
 struct ImagePicker: UIViewControllerRepresentable {
