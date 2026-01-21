@@ -12,15 +12,15 @@ struct WWMangaDetailsView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var viewModel: WWWatchListViewModel
     @State private var showEditView = false
-    let anime: WWAnime
+    let manga: WWManga
     var body: some View {
         VStack(spacing: 0) {
-            WWNavigationBarView(leadingButtonTapped: { dismiss() }, text: "Anime Details", trailingButtonTapped: { showEditView = true })
+            WWNavigationBarView(leadingButtonTapped: { dismiss() }, text: "Manga Details", trailingButtonTapped: { showEditView = true })
                 .frame(height: 72)
                 .padding(.top, 5)
             ScrollView(showsIndicators: false ) {
                 VStack(alignment: .leading, spacing: 24) {
-                    if let image = anime.image {
+                    if let image = manga.image {
                         Image(uiImage: image)
                             .resizable()
                             .scaledToFill()
@@ -39,20 +39,20 @@ struct WWMangaDetailsView: View {
                     }
                     
                     VStack(alignment: .leading, spacing: 16) {
-                        Text(anime.title)
+                        Text(manga.title)
                             .font(.system(size: 24, weight: .semibold))
                             .foregroundStyle(.white)
                         
                         HStack {
-                            Text(anime.status.text)
+                            Text(manga.status.text)
                                 .font(.system(size: 12, weight: .medium))
                                 .foregroundStyle(.white)
                                 .padding(.vertical, 4).padding(.horizontal, 12)
-                                .background(anime.status.bgColor)
+                                .background(manga.status.bgColor)
                                 .clipShape(RoundedRectangle(cornerRadius: 16))
                             
                             ForEach(Range(0...4), id: \.self) { num in
-                                Image(systemName: num < anime.rating ? "star.fill" : "star")
+                                Image(systemName: num < manga.rating ? "star.fill" : "star")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(height: 20)
@@ -73,18 +73,37 @@ struct WWMangaDetailsView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             VStack(spacing: 8) {
                                 HStack(spacing: 0) {
-                                    Text("Episodes")
-                                        .font(.system(size: 12, weight: .regular))
-                                        .foregroundStyle(.textPurple)
+                                    Text("Volumes")
+                                        .font(.system(size: 14, weight: .regular))
+                                        .foregroundStyle(.secondaryText)
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                     
-                                    Text("\(anime.currentEpisode) / \(anime.totalEpisodes)")
+                                    Text("\(manga.currentVolume) / \(manga.totalVolumes)")
                                         .font(.system(size: 14, weight: .medium))
                                         .foregroundStyle(.black)
                                 }
                                 
                                 WWProgressView(
-                                    value: Double(anime.currentEpisode) / Double(anime.totalEpisodes)
+                                    value: Double(manga.currentVolume) / Double(manga.totalVolumes),
+                                    color: .buttonsTop
+                                )
+                            }
+                            
+                            VStack(spacing: 8) {
+                                HStack(spacing: 0) {
+                                    Text("Pages")
+                                        .font(.system(size: 14, weight: .regular))
+                                        .foregroundStyle(.secondaryText)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    
+                                    Text("\(manga.currentPage) / \(manga.totalPages)")
+                                        .font(.system(size: 14, weight: .medium))
+                                        .foregroundStyle(.black)
+                                }
+                                
+                                WWProgressView(
+                                    value: Double(manga.currentVolume) / Double(manga.totalVolumes),
+                                    color: .buttonsTop
                                 )
                             }
                             
@@ -105,7 +124,7 @@ struct WWMangaDetailsView: View {
                                 .foregroundStyle(.textPurple)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 
-                                Text("\(hoursMinutes(from: anime.totalTime))")
+                                Text("\(hoursMinutes(from: manga.totalReadingTime))")
                                     .font(.system(size: 16, weight: .medium))
                                     .foregroundStyle(.yellow)
                             }
@@ -124,40 +143,58 @@ struct WWMangaDetailsView: View {
                             VStack(spacing: 12) {
                                 HStack(spacing: 0) {
                                     HStack(spacing: 8) {
-                                        Image(systemName: "calendar")
+                                        Image(systemName: "book")
                                             .resizable()
                                             .scaledToFit()
                                             .frame(height: 16)
                                         
-                                        Text("Year")
+                                        Text("Total Volumes")
                                             .font(.system(size: 14, weight: .regular))
                                     }
-                                    .foregroundStyle(.textPurple)
+                                    .foregroundStyle(.secondaryText)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     
-                                    Text("\(anime.year)")
+                                    Text("\(manga.totalVolumes)")
                                         .font(.system(size: 16, weight: .medium))
                                         .foregroundStyle(.black)
                                 }
                                 
                                 HStack(spacing: 0) {
-                                    Text("Total Episodes")
-                                        .font(.system(size: 12, weight: .regular))
-                                        .foregroundStyle(.textPurple)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    HStack(spacing: 8) {
+                                        Image(systemName: "doc.text")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(height: 16)
+                                        
+                                        Text("Pages per Volume")
+                                            .font(.system(size: 14, weight: .regular))
+                                    }
+                                    .foregroundStyle(.secondaryText)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                                     
-                                    Text("\(anime.totalEpisodes)")
+                                    Text("\(manga.pagePerVolume)")
                                         .font(.system(size: 16, weight: .medium))
                                         .foregroundStyle(.black)
                                 }
                                 
                                 HStack(spacing: 0) {
-                                    Text("Episode Duration")
-                                        .font(.system(size: 12, weight: .regular))
-                                        .foregroundStyle(.textPurple)
+                                    Text("Total Pages")
+                                        .font(.system(size: 14, weight: .regular))
+                                        .foregroundStyle(.secondaryText)
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                     
-                                    Text("\(anime.episodeDuration) min")
+                                    Text("\(manga.totalPages)")
+                                        .font(.system(size: 16, weight: .medium))
+                                        .foregroundStyle(.black)
+                                }
+                                
+                                HStack(spacing: 0) {
+                                    Text("Reading Speed")
+                                        .font(.system(size: 14, weight: .regular))
+                                        .foregroundStyle(.secondaryText)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    
+                                    Text("\(manga.readingSpeed) pages/min")
                                         .font(.system(size: 16, weight: .medium))
                                         .foregroundStyle(.black)
                                 }
@@ -171,7 +208,7 @@ struct WWMangaDetailsView: View {
                     }
                     
                     Button {
-                        viewModel.delete(anime: anime)
+                        viewModel.delete(manga: manga)
                         dismiss()
                     } label: {
                         HStack {
@@ -197,7 +234,7 @@ struct WWMangaDetailsView: View {
                 .scaledToFill()
         )
         .navigationDestination(isPresented: $showEditView) {
-            WWEditAnimeView(viewModel: viewModel, anime: anime)
+            WWEditMangaView(viewModel: viewModel, manga: manga)
                 .navigationBarBackButtonHidden()
         }
     }
@@ -211,16 +248,19 @@ struct WWMangaDetailsView: View {
 
 #Preview {
     NavigationStack {
-        WWAnimeDetailsView(viewModel: WWWatchListViewModel(), anime: WWAnime(
-            title: "Attack on Titan",
-            year: "2013",
-            seasons: 4,
-            totalEpisodes: 87,
-            episodeDuration: 24,
-            status: .watching,
-            currentEpisode: 44,
-            rating: 2,
-            note: "Note asjsadl jaksdjlas jklasdjsajd lasjkdjlkajs ")
+        WWMangaDetailsView(viewModel: WWWatchListViewModel(), manga:
+                            WWManga(
+                                title: "Berserk",
+                                totalVolumes: 41,
+                                pagePerVolume: 230,
+                                readingSpeed: 2,
+                                status: .paused,
+                                currentVolume: 30,
+                                currentPage: 6900,
+                                rating: 4,
+                                note: "Note",
+                                imageData: nil)
+                           
                            
         )
     }

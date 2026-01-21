@@ -2,7 +2,6 @@
 //  WWNewMangaView.swift
 //  Anime-Manga-Personal-Watchlist
 //
-//  Created by Dias Atudinov on 21.01.2026.
 //
 
 
@@ -16,12 +15,12 @@ struct WWNewMangaView: View {
     @State private var showingImagePicker = false
     
     @State private var title: String = ""
-    @State private var year = ""
-    @State private var seasons = ""
-    @State private var totalEpisodes = ""
-    @State private var episodeDuration = ""
+    @State private var totalVolumes = ""
+    @State private var pagePerVolume = ""
+    @State private var readingSpeed = ""
     @State private var status: ObjectStatus = .watching
-    @State private var currentEpisode = ""
+    @State private var currentVolume = ""
+    @State private var currentPage = ""
     @State private var rating = 0
     @State private var note = ""
     
@@ -31,7 +30,7 @@ struct WWNewMangaView: View {
                 
                 HStack {
                     OutlinedText(
-                        text: "Add Anime",
+                        text: "Add Manga",
                         font: .system(size: 24, weight: .semibold),
                         strokeColor: .textStroke,
                         fillColor: .white
@@ -92,7 +91,7 @@ struct WWNewMangaView: View {
                         
                         VStack(spacing: 16) {
                             textFiled(title: "Title *") {
-                                TextField("Enter anime title", text: $title)
+                                TextField("Enter manga title", text: $title)
                                     .padding(.vertical, 11).padding(.horizontal, 16)
                                     .background(.white)
                                     .clipShape(RoundedRectangle(cornerRadius: 16))
@@ -105,28 +104,11 @@ struct WWNewMangaView: View {
                                             .foregroundStyle(.loadImageBg)
                                             .padding()
                                     }
-                            }
-                            
-                            textFiled(title: "Year") {
-                                TextField("2026", text: $year)
-                                    .padding(.vertical, 11).padding(.horizontal, 16)
-                                    .background(.white)
-                                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                                    .overlay(alignment: .trailing) {
-                                        Image(systemName: "pencil")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(height: 20)
-                                            .bold()
-                                            .foregroundStyle(.loadImageBg)
-                                            .padding()
-                                    }
-                                    .keyboardType(.numberPad)
                             }
                             
                             HStack(spacing: 16) {
-                                textFiled(title: "Seasons") {
-                                    TextField("1", text: $seasons)
+                                textFiled(title: "Total Volumes") {
+                                    TextField("1", text: $totalVolumes)
                                         .padding(.vertical, 11).padding(.horizontal, 16)
                                         .background(.white)
                                         .clipShape(RoundedRectangle(cornerRadius: 16))
@@ -142,8 +124,8 @@ struct WWNewMangaView: View {
                                         .keyboardType(.numberPad)
                                 }
                                 
-                                textFiled(title: "Total Episodes") {
-                                    TextField("12", text: $totalEpisodes)
+                                textFiled(title: "Pages per Volume") {
+                                    TextField("200", text: $pagePerVolume)
                                         .padding(.vertical, 11).padding(.horizontal, 16)
                                         .background(.white)
                                         .clipShape(RoundedRectangle(cornerRadius: 16))
@@ -160,8 +142,21 @@ struct WWNewMangaView: View {
                                 }
                             }
                             
-                            textFiled(title: "Episode Duration (minutes)") {
-                                TextField("24", text: $episodeDuration)
+                            textFiled(title: "Total Pages (Auto-calculated)") {
+                                let totalVolumes = Double(totalVolumes) ?? 0.0
+                                let pagePerVolume = Double(pagePerVolume) ?? 0.0
+                                
+                                Text("\(Int(totalVolumes * pagePerVolume))")
+                                    .foregroundStyle(.textPurple)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.vertical, 11).padding(.horizontal, 16)
+                                    .background(.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                                
+                            }
+                            
+                            textFiled(title: "Reading Speed (pages per minute)") {
+                                TextField("2", text: $readingSpeed)
                                     .padding(.vertical, 11).padding(.horizontal, 16)
                                     .background(.white)
                                     .clipShape(RoundedRectangle(cornerRadius: 16))
@@ -177,10 +172,14 @@ struct WWNewMangaView: View {
                                     .keyboardType(.numberPad)
                             }
                             
-                            textFiled(title: "Total Time (Auto-calculated)") {
-                                let totalEpisodes = Double(totalEpisodes) ?? 0.0
-                                let episodeDuration = Double(episodeDuration) ?? 0.0
-                                Text("\(hoursMinutes(from: Int(totalEpisodes * episodeDuration)))")
+                            textFiled(title: "Total Reading Time (Auto-calculated)") {
+                                let totalVolumes = Double(totalVolumes) ?? 0.0
+                                let pagePerVolume = Double(pagePerVolume) ?? 0.0
+                                let readingSpeed = max(1.0, Double(readingSpeed) ?? 1.0)
+                                
+                                let totalReadingTime = (totalVolumes * pagePerVolume) / readingSpeed
+                                
+                                Text("\(hoursMinutes(from: Int(totalReadingTime)))")
                                     .foregroundStyle(.textPurple)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .padding(.vertical, 11).padding(.horizontal, 16)
@@ -207,8 +206,25 @@ struct WWNewMangaView: View {
                                 }
                             }
                             
-                            textFiled(title: "Current Episode") {
-                                TextField("0", text: $currentEpisode)
+                            textFiled(title: "Current Volume") {
+                                TextField("0", text: $currentVolume)
+                                    .padding(.vertical, 11).padding(.horizontal, 16)
+                                    .background(.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                                    .overlay(alignment: .trailing) {
+                                        Image(systemName: "pencil")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(height: 20)
+                                            .bold()
+                                            .foregroundStyle(.loadImageBg)
+                                            .padding()
+                                    }
+                                    .keyboardType(.numberPad)
+                            }
+                            
+                            textFiled(title: "Current Page") {
+                                TextField("0", text: $currentPage)
                                     .padding(.vertical, 11).padding(.horizontal, 16)
                                     .background(.white)
                                     .clipShape(RoundedRectangle(cornerRadius: 16))
@@ -268,27 +284,25 @@ struct WWNewMangaView: View {
                         }
                         
                         Button {
-                            guard let seasons = Int(seasons), let totalEpisodes = Int(totalEpisodes), let episodeDuration = Int(episodeDuration),
-                                  let currentEpisode = Int(currentEpisode) else { return }
-                            
-                            let anime = WWAnime(
+                            let manga = WWManga(
                                 title: title,
-                                year: year,
-                                seasons: seasons,
-                                totalEpisodes: totalEpisodes,
-                                episodeDuration: episodeDuration,
+                                totalVolumes: Int(totalVolumes) ?? 0,
+                                pagePerVolume: Int(pagePerVolume) ?? 0,
+                                readingSpeed: Int(readingSpeed) ?? 1,
                                 status: status,
-                                currentEpisode: currentEpisode,
+                                currentVolume: Int(currentVolume) ?? 0,
+                                currentPage: Int(currentPage) ?? 0,
                                 rating: rating,
                                 note: note,
                                 imageData: selectedImage?.jpegData(compressionQuality: 0.7)
                             )
-                            viewModel.add(anime: anime)
+                            
+                            viewModel.add(manga: manga)
                             dismiss()
                         } label: {
                             HStack {
                                 
-                                Text("Add Anime")
+                                Text("Add Manga")
                                     .font(.system(size: 16, weight: .medium))
                                 
                             }
@@ -338,5 +352,5 @@ struct WWNewMangaView: View {
 }
 
 #Preview {
-    WWNewAnimeView(viewModel: WWWatchListViewModel())
+    WWNewMangaView(viewModel: WWWatchListViewModel())
 }

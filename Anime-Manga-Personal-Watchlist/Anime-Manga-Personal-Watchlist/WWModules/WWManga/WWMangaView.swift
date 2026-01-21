@@ -1,39 +1,38 @@
 //
-//  WWAnimeView.swift
+//  WWMangaView.swift
 //  Anime-Manga-Personal-Watchlist
 //
-//  Created by Dias Atudinov on 21.01.2026.
 //
 
 
 import SwiftUI
 
-struct WWAnimeView: View {
+struct WWMangaView: View {
     @ObservedObject var viewModel: WWWatchListViewModel
     var body: some View {
         VStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 4) {
                 OutlinedText(
-                    text: "My Anime",
+                    text: "My Manga",
                     font: .system(size: 36, weight: .medium),
                     strokeColor: .textStroke,
                     fillColor: .white
                 )
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
-                Text("\(viewModel.animes.count) titles")
+                Text("\(viewModel.mangas.count) titles")
                     .font(.system(size: 14, weight: .regular))
                     .foregroundStyle(.white)
             }
             
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 16) {
-                    ForEach(viewModel.animes, id: \.id) { anime in
+                    ForEach(viewModel.mangas, id: \.id) { manga in
                         NavigationLink {
-                            WWAnimeDetailsView(viewModel: viewModel, anime: anime)
+                            WWMangaDetailsView(viewModel: viewModel, manga: manga)
                                 .navigationBarBackButtonHidden()
                         } label: {
-                            WWAnimeCell(anime: anime)
+                            WWMangaCell(manga: manga)
                         }
                     }
                 }.padding(.bottom, 100)
@@ -48,7 +47,7 @@ struct WWAnimeView: View {
         )
         .overlay(alignment: .bottomTrailing) {
             NavigationLink {
-                WWNewAnimeView(viewModel: viewModel)
+                WWNewMangaView(viewModel: viewModel)
                     .navigationBarBackButtonHidden()
             } label: {
                 HStack {
@@ -57,7 +56,7 @@ struct WWAnimeView: View {
                         .scaledToFit()
                         .frame(height: 14)
                     
-                    Text("Add Anime")
+                    Text("Add Manga")
                         .font(.system(size: 16, weight: .medium))
                         
                 }
@@ -68,13 +67,13 @@ struct WWAnimeView: View {
                 
             }
             .padding(24)
-            .padding(.bottom, 105)
+            .padding(.bottom, 130)
         }
     }
 }
 
 #Preview {
     NavigationStack {
-        WWAnimeView(viewModel: WWWatchListViewModel())
+        WWMangaView(viewModel: WWWatchListViewModel())
     }
 }

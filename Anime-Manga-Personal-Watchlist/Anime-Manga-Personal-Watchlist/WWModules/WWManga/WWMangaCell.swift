@@ -1,18 +1,17 @@
 //
-//  WWAnimeCell.swift
+//  WWMangaCell.swift
 //  Anime-Manga-Personal-Watchlist
 //
-//  Created by Dias Atudinov on 21.01.2026.
 //
 
 
 import SwiftUI
 
-struct WWAnimeCell: View {
-    let anime: WWAnime
+struct WWMangaCell: View {
+    let manga: WWManga
     var body: some View {
         HStack(spacing: 16) {
-            if let image = anime.image {
+            if let image = manga.image {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
@@ -23,7 +22,7 @@ struct WWAnimeCell: View {
                     .fill(.imageShimmerBg)
                     .frame(width: 80, height: 112)
                     .overlay {
-                        Image(.animeIconWW)
+                        Image(.mangaIconWW)
                             .resizable()
                             .scaledToFit()
                             .frame(height: 32)
@@ -31,32 +30,33 @@ struct WWAnimeCell: View {
             }
             
             VStack(alignment: .leading, spacing: 10) {
-                Text(anime.title)
+                Text(manga.title)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(.black)
                 
-                Text(anime.status.text)
+                Text(manga.status.text)
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(.white)
                     .padding(.vertical, 4).padding(.horizontal, 12)
-                    .background(anime.status.bgColor)
+                    .background(manga.status.bgColor)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                 
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        Text("Progress")
+                        Text("Volume")
                             .font(.system(size: 12, weight: .regular))
                             .foregroundStyle(.secondaryText)
                             .frame(maxWidth: .infinity, alignment: .leading)
                         
-                        Text("\(anime.currentEpisode) / \(anime.totalEpisodes)")
+                        Text("\(manga.currentVolume) / \(manga.totalVolumes)")
                             .font(.system(size: 14, weight: .medium))
                             .foregroundStyle(.black)
                         
                     }
                     
                     WWProgressView(
-                        value: Double(anime.currentEpisode) / Double(anime.totalEpisodes)
+                        value: Double(manga.currentVolume) / Double(manga.totalVolumes),
+                        color: .buttonsTop
                     )
                 }
                     
@@ -69,15 +69,16 @@ struct WWAnimeCell: View {
 }
 
 #Preview {
-    WWAnimeCell(anime: WWAnime(
-        title: "Attack on Titan",
-        year: "2013",
-        seasons: 4,
-        totalEpisodes: 87,
-        episodeDuration: 24,
-        status: .watching,
-        currentEpisode: 44,
-        rating: 5,
-        note: "Note asjsadl jaksdjlas jklasdjsajd lasjkdjlkajs ")
+    WWMangaCell(manga: WWManga(
+        title: "Berserk",
+        totalVolumes: 41,
+        pagePerVolume: 230,
+        readingSpeed: 2,
+        status: .paused,
+        currentVolume: 30,
+        currentPage: 6900,
+        rating: 4,
+        note: "Note",
+        imageData: nil)
     )
 }

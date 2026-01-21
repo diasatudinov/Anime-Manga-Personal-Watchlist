@@ -1,27 +1,30 @@
 //
-//  WWAnime.swift
+//  WWManga.swift
 //  Anime-Manga-Personal-Watchlist
 //
-//  Created by Dias Atudinov on 21.01.2026.
 //
 
 
 import SwiftUI
 
-struct WWAnime: Codable, Hashable, Identifiable {
+struct WWManga: Codable, Hashable, Identifiable {
     let id = UUID()
     var title: String
-    var year: String
-    var seasons: Int
-    var totalEpisodes: Int
-    var episodeDuration: Int
+    var totalVolumes: Int
+    var pagePerVolume: Int
+    var readingSpeed: Int
     var status: ObjectStatus
-    var currentEpisode: Int
+    var currentVolume: Int
+    var currentPage: Int
     var rating: Int
     var note: String
     
-    var totalTime: Int {
-        return totalEpisodes * episodeDuration
+    var totalPages: Int {
+        return totalVolumes * pagePerVolume
+    }
+    
+    var totalReadingTime: Int {
+        return totalPages / readingSpeed
     }
     
     var imageData: Data?

@@ -2,27 +2,26 @@
 //  WWEditAnimeView.swift
 //  Anime-Manga-Personal-Watchlist
 //
-//  Created by Dias Atudinov on 21.01.2026.
 //
 
 
 import SwiftUI
 
-struct WWEditAnimeView: View {
+struct WWEditMangaView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var viewModel: WWWatchListViewModel
-    let anime: WWAnime
+    let manga: WWManga
     
     @State private var selectedImage: UIImage?
     @State private var showingImagePicker = false
     
     @State private var title: String = ""
-    @State private var year = ""
-    @State private var seasons = ""
-    @State private var totalEpisodes = ""
-    @State private var episodeDuration = ""
+    @State private var totalVolumes = ""
+    @State private var pagePerVolume = ""
+    @State private var readingSpeed = ""
     @State private var status: ObjectStatus = .watching
-    @State private var currentEpisode = ""
+    @State private var currentVolume = ""
+    @State private var currentPage = ""
     @State private var rating = 0
     @State private var note = ""
     
@@ -32,7 +31,7 @@ struct WWEditAnimeView: View {
                 
                 HStack {
                     OutlinedText(
-                        text: "Edit Anime",
+                        text: "Edit Manga",
                         font: .system(size: 24, weight: .semibold),
                         strokeColor: .textStroke,
                         fillColor: .white
@@ -93,7 +92,7 @@ struct WWEditAnimeView: View {
                         
                         VStack(spacing: 16) {
                             textFiled(title: "Title *") {
-                                TextField("Enter anime title", text: $title)
+                                TextField("Enter manga title", text: $title)
                                     .padding(.vertical, 11).padding(.horizontal, 16)
                                     .background(.white)
                                     .clipShape(RoundedRectangle(cornerRadius: 16))
@@ -106,28 +105,11 @@ struct WWEditAnimeView: View {
                                             .foregroundStyle(.loadImageBg)
                                             .padding()
                                     }
-                            }
-                            
-                            textFiled(title: "Year") {
-                                TextField("2026", text: $year)
-                                    .padding(.vertical, 11).padding(.horizontal, 16)
-                                    .background(.white)
-                                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                                    .overlay(alignment: .trailing) {
-                                        Image(systemName: "pencil")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(height: 20)
-                                            .bold()
-                                            .foregroundStyle(.loadImageBg)
-                                            .padding()
-                                    }
-                                    .keyboardType(.numberPad)
                             }
                             
                             HStack(spacing: 16) {
-                                textFiled(title: "Seasons") {
-                                    TextField("1", text: $seasons)
+                                textFiled(title: "Total Volumes") {
+                                    TextField("1", text: $totalVolumes)
                                         .padding(.vertical, 11).padding(.horizontal, 16)
                                         .background(.white)
                                         .clipShape(RoundedRectangle(cornerRadius: 16))
@@ -143,8 +125,8 @@ struct WWEditAnimeView: View {
                                         .keyboardType(.numberPad)
                                 }
                                 
-                                textFiled(title: "Total Episodes") {
-                                    TextField("12", text: $totalEpisodes)
+                                textFiled(title: "Pages per Volume") {
+                                    TextField("200", text: $pagePerVolume)
                                         .padding(.vertical, 11).padding(.horizontal, 16)
                                         .background(.white)
                                         .clipShape(RoundedRectangle(cornerRadius: 16))
@@ -161,8 +143,21 @@ struct WWEditAnimeView: View {
                                 }
                             }
                             
-                            textFiled(title: "Episode Duration (minutes)") {
-                                TextField("24", text: $episodeDuration)
+                            textFiled(title: "Total Pages (Auto-calculated)") {
+                                let totalVolumes = Double(totalVolumes) ?? 0.0
+                                let pagePerVolume = Double(pagePerVolume) ?? 0.0
+                                
+                                Text("\(Int(totalVolumes * pagePerVolume))")
+                                    .foregroundStyle(.textPurple)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.vertical, 11).padding(.horizontal, 16)
+                                    .background(.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                                
+                            }
+                            
+                            textFiled(title: "Reading Speed (pages per minute)") {
+                                TextField("2", text: $readingSpeed)
                                     .padding(.vertical, 11).padding(.horizontal, 16)
                                     .background(.white)
                                     .clipShape(RoundedRectangle(cornerRadius: 16))
@@ -178,10 +173,14 @@ struct WWEditAnimeView: View {
                                     .keyboardType(.numberPad)
                             }
                             
-                            textFiled(title: "Total Time (Auto-calculated)") {
-                                let totalEpisodes = Double(totalEpisodes) ?? 0.0
-                                let episodeDuration = Double(episodeDuration) ?? 0.0
-                                Text("\(hoursMinutes(from: Int(totalEpisodes * episodeDuration)))")
+                            textFiled(title: "Total Reading Time (Auto-calculated)") {
+                                let totalVolumes = Double(totalVolumes) ?? 0.0
+                                let pagePerVolume = Double(pagePerVolume) ?? 0.0
+                                let readingSpeed = max(1.0, Double(readingSpeed) ?? 1.0)
+                                
+                                let totalReadingTime = (totalVolumes * pagePerVolume) / readingSpeed
+                                
+                                Text("\(hoursMinutes(from: Int(totalReadingTime)))")
                                     .foregroundStyle(.textPurple)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .padding(.vertical, 11).padding(.horizontal, 16)
@@ -208,8 +207,25 @@ struct WWEditAnimeView: View {
                                 }
                             }
                             
-                            textFiled(title: "Current Episode") {
-                                TextField("0", text: $currentEpisode)
+                            textFiled(title: "Current Volume") {
+                                TextField("0", text: $currentVolume)
+                                    .padding(.vertical, 11).padding(.horizontal, 16)
+                                    .background(.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                                    .overlay(alignment: .trailing) {
+                                        Image(systemName: "pencil")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(height: 20)
+                                            .bold()
+                                            .foregroundStyle(.loadImageBg)
+                                            .padding()
+                                    }
+                                    .keyboardType(.numberPad)
+                            }
+                            
+                            textFiled(title: "Current Page") {
+                                TextField("0", text: $currentPage)
                                     .padding(.vertical, 11).padding(.horizontal, 16)
                                     .background(.white)
                                     .clipShape(RoundedRectangle(cornerRadius: 16))
@@ -269,26 +285,25 @@ struct WWEditAnimeView: View {
                         }
                         
                         Button {
-                            guard let seasons = Int(seasons), let totalEpisodes = Int(totalEpisodes), let episodeDuration = Int(episodeDuration),
-                                  let currentEpisode = Int(currentEpisode) else { return }
-                            
-                            viewModel.editAnime(id: self.anime.id) { a in
-                                a.title = title
-                                a.year = year
-                                a.seasons = seasons
-                                a.totalEpisodes = totalEpisodes
-                                a.episodeDuration = episodeDuration
-                                a.status = status
-                                a.currentEpisode = currentEpisode
-                                a.rating = rating
-                                a.note = note
-                                a.imageData = selectedImage?.jpegData(compressionQuality: 0.7)
+                            viewModel.editManga(id: self.manga.id) { m in
+                                m.title = title
+                                m.totalVolumes = Int(totalVolumes) ?? 0
+                                m.pagePerVolume = Int(pagePerVolume) ?? 0
+                                m.readingSpeed = Int(readingSpeed) ?? 1
+                                m.status = status
+                                m.currentVolume = Int(currentVolume) ?? 0
+                                m.currentPage = Int(currentPage) ?? 0
+                                m.rating = rating
+                                m.note = note
+                                m.imageData = selectedImage?.jpegData(compressionQuality: 0.7)
                             }
                             dismiss()
                         } label: {
                             HStack {
+                                
                                 Text("Save Changes")
                                     .font(.system(size: 16, weight: .medium))
+                                
                             }
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
@@ -307,17 +322,16 @@ struct WWEditAnimeView: View {
             ImagePicker(selectedImage: $selectedImage, isPresented: $showingImagePicker)
         }
         .onAppear {
-            
-            title = anime.title
-            year = anime.year
-            seasons = "\(anime.seasons)"
-            totalEpisodes = "\(anime.totalEpisodes)"
-            episodeDuration = "\(anime.episodeDuration)"
-            status = anime.status
-            currentEpisode = "\(anime.currentEpisode)"
-            rating = anime.rating
-            note = anime.note
-            selectedImage = anime.image
+            title = manga.title
+            totalVolumes = "\(manga.totalVolumes)"
+            pagePerVolume = "\(manga.pagePerVolume)"
+            readingSpeed =  "\(manga.readingSpeed)"
+            status = manga.status
+            currentVolume = "\(manga.currentVolume)"
+            currentPage = "\(manga.currentPage)"
+            rating = manga.rating
+            note = manga.note
+            selectedImage = manga.image
         }
     }
     
@@ -349,15 +363,17 @@ struct WWEditAnimeView: View {
 }
 
 #Preview {
-    WWEditAnimeView(viewModel: WWWatchListViewModel(),
-                    anime:  WWAnime(
-                        title: "Attack on Titan",
-                        year: "2013",
-                        seasons: 4,
-                        totalEpisodes: 87,
-                        episodeDuration: 24,
-                        status: .watching,
-                        currentEpisode: 44,
-                        rating: 5,
-                        note: "Note asjsadl jaksdjlas jklasdjsajd lasjkdjlkajs "))
+    WWEditMangaView(viewModel: WWWatchListViewModel(),
+                    manga: WWManga(
+                        title: "Berserk",
+                        totalVolumes: 41,
+                        pagePerVolume: 230,
+                        readingSpeed: 2,
+                        status: .paused,
+                        currentVolume: 30,
+                        currentPage: 6900,
+                        rating: 4,
+                        note: "Note",
+                        imageData: nil)
+    )
 }
